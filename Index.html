@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2a0a1a">
+<title>NIZAR × MANAR</title>
+<style>
+/* ========== 1) الألوان والخطوط — بدّل القيم هنا ========== */
+:root{
+  --bg1:#2a0a1a; --bg2:#5a1230; --rose:#e8909f; --wine:#8e2a45; --cream:#fbf0e4; --gold:#d9b27c;
+  --font:'Amiri','Noto Naskh Arabic','Scheherazade New','Geeza Pro','Segoe UI',Tahoma,serif;
+}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg1);color:var(--cream);font-family:var(--font);font-size:18px;line-height:1.9}
+body{background:radial-gradient(120% 90% at 50% 20%,var(--bg2),var(--bg1) 70%)}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+/* خلفية القلوب العائمة */
+#bg{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+#bg span{position:absolute;bottom:-40px;color:var(--rose);opacity:0;animation:rise linear infinite}
+@keyframes rise{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:.5}100%{transform:translateY(-110vh) scale(1.1);opacity:0}}
+
+/* الشاشات */
+.screen{position:fixed;inset:0;display:flex;overflow-y:auto;z-index:1;opacity:0;visibility:hidden;transform:scale(.97) translateY(14px);
+  transition:opacity .7s,transform .7s,visibility 0s .7s;
+  padding:calc(env(safe-area-inset-top) + 3.2rem) calc(env(safe-area-inset-right) + 1.2rem) calc(env(safe-area-inset-bottom) + 1.4rem) calc(env(safe-area-inset-left) + 1.2rem)}
+.screen.on{opacity:1;visibility:visible;transform:none;transition:opacity .7s,transform .7s}
+.wrap{margin:auto;width:100%;max-width:560px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.2rem}
+h1,h2{font-weight:700;line-height:1.5}
+h1{font-size:2.1rem;letter-spacing:.04em;direction:ltr}
+h2{font-size:1.5rem;color:var(--gold)}
+.names{direction:ltr;color:var(--gold);letter-spacing:.2em;font-size:1.05rem}
+.btn{padding:.8rem 1.8rem;min-height:48px;border-radius:999px;background:linear-gradient(135deg,#b23a5c,var(--wine));border:1px solid var(--gold);
+  box-shadow:0 0 18px rgba(232,144,159,.35);transition:transform .2s,box-shadow .2s;animation:glow 3s ease-in-out infinite}
+.btn:active{transform:scale(.95)}
+@keyframes glow{50%{box-shadow:0 0 28px rgba(232,144,159,.7)}}
+.hid{opacity:0;transform:translateY(10px);transition:opacity 1.2s,transform 1.2s}
+.hid.show{opacity:1;transform:none}
+.dim{opacity:.8}
+
+/* التقدم والتحكم */
+#dots{position:fixed;top:calc(env(safe-area-inset-top) + 1rem);left:0;right:0;display:none;justify-content:center;gap:.5rem;z-index:5}
+#dots i{width:9px;height:9px;border-radius:50%;background:rgba(251,240,228,.25);transition:.4s}
+#dots i.a{background:var(--rose);transform:scale(1.4)}
+#back{position:fixed;top:calc(env(safe-area-inset-top) + .4rem);right:.6rem;z-index:6;width:44px;height:44px;font-size:1.4rem;display:none}
+
+/* ========== 2) الظرف ========== */
+.env{position:relative;width:min(78vw,300px);height:min(52vw,200px);perspective:900px;margin:1rem 0 1.5rem}
+.env .back{position:absolute;inset:0;background:#7a1f3d;border-radius:8px;box-shadow:0 20px 40px rgba(0,0,0,.5)}
+.paper{position:absolute;left:9%;right:9%;top:8%;height:80%;background:var(--cream);border-radius:4px;z-index:2;transition:transform 1.3s ease .7s;
+  display:flex;align-items:center;justify-content:center;color:var(--wine);font-size:1.2rem}
+.env.open .paper{transform:translateY(-75%)}
+.front{position:absolute;inset:0;z-index:3;border-radius:8px;background:linear-gradient(#a8325a,#7a1f3d);clip-path:polygon(0 0,50% 55%,100% 0,100% 100%,0 100%)}
+.flap{position:absolute;left:0;top:0;width:100%;height:56%;z-index:4;background:linear-gradient(#c04468,#8e2a45);clip-path:polygon(0 0,100% 0,50% 100%);
+  transform-origin:top;transition:transform .9s ease .2s,z-index 0s .6s}
+.env.open .flap{transform:rotateX(180deg);z-index:1}
+.seal{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px;z-index:5;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ef5b73,#a01c3a);
+  color:#ffd9de;font-size:1.6rem;box-shadow:0 4px 10px rgba(0,0,0,.45);transition:opacity .4s,transform .4s;animation:beat 1.8s infinite}
+.env.open .seal{opacity:0;transform:scale(.3);pointer-events:none}
+@keyframes beat{50%{transform:scale(1.1)}}
+
+/* الرسالة والبطاقات */
+.letter{background:var(--cream);color:#4a1a2a;border-radius:6px;padding:1.4rem 1.2rem;text-align:right;box-shadow:0 14px 40px rgba(0,0,0,.45);width:100%;
+  background-image:repeating-linear-gradient(transparent 0 33px,rgba(142,42,69,.08) 33px 34px);line-height:34px;max-height:62dvh;max-height:62vh;overflow-y:auto}
+.letter p{margin-bottom:.9rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;width:100%}
+.card{padding:1rem .7rem;border-radius:16px;background:rgba(251,240,228,.08);border:1px solid rgba(217,178,124,.35);line-height:1.6;transition:box-shadow .3s,transform .3s;position:relative}
+.card.pulse{box-shadow:0 0 26px rgba(232,144,159,.8);transform:scale(1.04)}
+.card b{display:block;color:var(--gold);margin:.2rem 0}.card small{font-size:.95rem;display:block}
+.card .ic{font-size:1.7rem}
+.reason{font-size:1.25rem;min-height:3.4em;display:flex;align-items:center}
+
+/* القلب السري */
+.heart{width:min(62vw,240px);aspect-ratio:1;position:relative;filter:drop-shadow(0 0 22px rgba(255,80,110,.65));animation:breathe 4s ease-in-out infinite;transition:transform .5s}
+.heart svg{width:100%;height:100%}
+.heart.pop{animation:none;transform:scale(1.25)}
+.heart.open{animation:none;transform:scale(.85);opacity:.25;transition:.9s}
+@keyframes breathe{50%{transform:scale(1.07)}}
+#secret{font-size:1.3rem;max-width:30ch}
+
+/* قلوب الانفجار */
+.p{position:fixed;z-index:50;pointer-events:none;color:var(--rose);animation:fly 1.5s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--x),var(--y)) scale(.3) rotate(var(--r));opacity:0}}
+
+/* مزايا إضافية: لمعان ذهبي، نجوم، بتلات، أثر اللمس، زر الصوت */
+h2,.names{background:linear-gradient(90deg,#d9b27c,#fff1d0,#d9b27c);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite}
+@keyframes shine{to{background-position:-200% 0}}
+#bg{transition:transform .6s ease-out}
+#bg b{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;animation:tw 3s ease-in-out infinite}
+@keyframes tw{50%{opacity:.1}}
+.petal{position:fixed;top:-20px;z-index:2;pointer-events:none;width:12px;height:16px;border-radius:80% 0 80% 0;background:linear-gradient(135deg,#ff8aa0,#b23a5c);opacity:.8;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(540deg)}}
+.trail{position:fixed;z-index:40;pointer-events:none;width:10px;height:10px;margin:-5px;border-radius:50%;background:radial-gradient(#fff,var(--rose) 60%,transparent);animation:tr .8s forwards}
+@keyframes tr{to{transform:scale(0);opacity:0}}
+.polaroid{background:#fff;padding:8px 8px 28px;border-radius:3px;box-shadow:0 12px 30px rgba(0,0,0,.5)}.polaroid img{width:min(60vw,220px);display:block}
+.rose{position:fixed;z-index:3;font-size:2rem;margin:-1rem;pointer-events:none;animation:bloom 3s forwards}
+@keyframes bloom{0%{transform:scale(0) rotate(-30deg);opacity:0}25%{transform:scale(1.2);opacity:1}100%{transform:scale(1) translateY(-30px);opacity:0}}
+#since{color:var(--gold);font-size:1.15rem}
+@media (max-height:520px){.env{height:130px;width:200px}h1{font-size:1.6rem}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+<div id="bg" aria-hidden="true"></div>
+<div id="dots" aria-hidden="true"></div>
+<button id="back" aria-label="الشاشة السابقة">➜</button>
+
+<!-- ========== 3) الشاشات الثمانية ========== -->
+<main>
+<section class="screen on" id="s0"><div class="wrap">
+  <div class="names">NIZAR × MANAR</div>
+  <div class="env" id="env"><div class="back"></div><div class="paper">❤</div><div class="front"></div><div class="flap"></div>
+    <button class="seal" id="seal" aria-label="فتح الظرف">♥</button></div>
+  <p id="s0t"></p>
+  <button class="btn" id="open">حل الظرف</button>
+</div></section>
+
+<section class="screen" id="s1"><div class="wrap">
+  <h2 id="s1h"></h2><div id="s1l" style="display:contents"></div>
+  <button class="btn hid" id="n1" data-next>الأميرة كملي ❤️</button>
+</div></section>
+
+<section class="screen" id="s2"><div class="wrap">
+  <h2>رسالة ليك</h2><div class="letter hid" id="letter" tabindex="0"></div>
+  <button class="btn" data-next>كمل</button>
+</div></section>
+
+<section class="screen" id="s3"><div class="wrap">
+  <h2 id="s3h"></h2><div class="grid" id="grid"></div>
+  <button class="btn" data-next>كمل</button>
+</div></section>
+
+<section class="screen" id="s4"><div class="wrap">
+  <h2 id="s4h"></h2><p class="reason hid" id="reason" aria-live="polite"></p>
+  <button class="btn" id="more">ورّيني أكثر</button>
+  <button class="btn" id="n4" data-next style="display:none">كمل</button>
+</div></section>
+
+<section class="screen" id="s6"><div class="wrap">
+  <div id="words" style="display:contents" aria-live="polite"></div>
+  <button class="btn" data-next>كمل</button>
+  <button class="dim" id="still" aria-pressed="false">وقّف الحركة</button>
+</div></section>
+
+<section class="screen" id="s7"><div class="wrap">
+  <p id="s7t"></p>
+  <button class="heart" id="heart" aria-label="افتح القلب">
+    <svg viewBox="0 0 100 90"><defs><radialGradient id="g" cx="35%" cy="30%"><stop offset="0" stop-color="#ff7a92"/><stop offset="1" stop-color="#a01c3a"/></radialGradient></defs>
+    <path d="M50 85C10 55 2 30 18 15c12-10 26-4 32 8 6-12 20-18 32-8 16 15 8 40-32 70z" fill="url(#g)"/>
+    <path d="M50 23v62" stroke="#ffd9de" stroke-opacity=".25" stroke-width="1.5"/></svg></button>
+  <p id="secret" class="hid" aria-live="polite"></p>
+  <button class="btn hid" id="n7" data-next style="display:none">كمل</button>
+</div></section>
+
+<section class="screen" id="s8"><div class="wrap">
+  <div class="names" style="font-size:1.6rem">NIZAR × MANAR</div>
+  <p id="end" class="hid" style="font-size:1.2rem"></p>
+  <p id="sign" class="hid" style="color:var(--gold);font-size:1.3rem"></p>
+  <div id="photo" class="polaroid hid" hidden></div>
+  <p id="since" class="hid"></p>
+  <div class="grid hid" id="when"></div>
+  <p id="note" class="letter" hidden></p>
+  <button class="btn hid" id="replay">نعاودو الحكاية من الأول 🌹</button>
+</div></section>
+</main>
+
+<script>
+/* ========== 4) كل الرسائل هنا — عدّل النصوص والأسماء من هاد المكان فقط ========== */
+const C={
+  names:{him:"Nizar",her:"Manar"},   // لتغيير الأسماء: بدّلها هنا وفي وسم <title> وفي العناوين بالأعلى
+  envelopeCall:"عندك رسالة، منار… حلّيها بشوية.",
+  welcome:"منار، اليوم بغيت نعطيك واحد الحاجة مختلفة شوية… حاجة صممتها ليك من قلبي.",
+  welcomeLines:["هاد اللحظة ديالك.","كل تفصيلة هنا عندها معنى.","وكل كلمة كتعبّر على شي حاجة كنحس بيها تجاهك."],
+  letter:[
+    "سلام منار،",
+    "كنكتب ليك هاد الكلمات وأنا بغيت تحسي بالصدق اللي فيها. ماشي سهل نلقى الكلمات اللي توصف شنو كنحس، ولكن حاولت.",
+    "وجودك فحياتي حاجة كنقدّرها بزاف. كاين ناس كيدخلو لحياتك وكيبدلو فيها الإحساس بلا ما تفهم كيفاش، وأنتِ من هاد الناس.",
+    "كنشكرك على الاهتمام، وعلى الوقت، وعلى الراحة اللي كنحس بها كي كنكون معاك.",
+    "بغيتك تعرفي بلي كنشوفك إنسانة مميزة، وبلي مشاعري تجاهك صادقة وبسيطة، بلا مبالغة وبلا كلام خاوي.",
+    "وهاد الموقع كامل غير باب صغير باش نقول ليك: راه كنموت عليك أكنبغيك بزاف.",
+    "نزار"],
+  likeTitle:"أشياء كنحبها فيكِ يا منار ❤️",
+  likes:[ // [رمز، عنوان، وصف]
+    ["✨","الفرحة","وجودك كيزيد شي نور صغير فنهاري."],
+    ["🌸","التفاصيل","حتى الحوايج الصغار فيك عندهم قيمة عندي."],
+    ["🤝","التفاهم","الراحة اللي كاينة بيناتنا حاجة كنقدّرها."],
+    ["💬","الهضرة","الهضرة معاك عندها طعم خاص."],
+    ["👁️","عيونك","«فعيونك كاين جمال ما كيتوصفش، غير كيتحسّ ❤️👀»."],
+    ["💛","منار","نتي كولشي كيعجبني ."],
+    ["🌙","السكينة","معاك كنحس براحة وهدوء."],
+    ["🎁","أنتِ","ببساطة، أنتِ إنسانة غالية عليا."]],
+  whyTitle:"عارفة علاش عندك بلاصة خاصة عندي؟",
+  why:["حيت وجودك كيضيف لنهاري واحد الإحساس زوين.","حيت الوقت اللي كندوزو معاك عندو طعم خاص.","حيت كنهظر معاك كنسى أي حاجة.","حيت بغيتك ديما تعرفي بلي راك إنسانة عندها قيمة كبيرة عندي."],
+  words:["منار…","بغيتك تعرفي واحد الحاجة.","راك ماشي غير اسم فحياتي.","راك إنسانة كنقدّر وجودها.","وكنتمنا ديما تحسي براسك مميزة عندي."],
+  heartCall:"باقي مخبي ليك واحد الحاجة… واش تفتحي قلبي؟",
+  secret:"منار… هادشي غير شويا من الحب ديالي ليلك. كنتمنى هاد الموقع يجيب لوجهك ابتسامة، ولو صغيرة. وجودك فحياتي نعمة كنشكر عليها، وغادي نبقى معاك وخا يوقع لي وقع .",
+  ending:"منار، إلا كان عندي شي حاجة بغيتك تخرجي بها من هاد الموقع، فهي أنك تعرفي بلي صممت هاد اللحظات باش نقول ليك بطريقة مختلفة شحال وجودك مهم عندي. هاد الموقع كامل غير طريقة صغيرة باش نعبّر ليك على مشاعر أكبر من الكلمات.",
+  sign:"من نزار، بكل حب ❤️",
+  since:"",            // تاريخ اختياري بصيغة "2025-01-31" لعدّاد الأيام فالخاتمة (خليه فارغ لإخفاء العدّاد)
+  sinceText:"يوم داز وأنا فرحان بوجودك فحياتي.",
+  photo:"",            // صورة اختيارية: ضع اسم الملف أو رابطه، مثال "manar.jpg" (خليه فارغ بلا صورة)
+  notes:[ // رسائل "حلّيها كي..."
+    ["منين تكون واقعالى شي حاجة","ارتاحي شوية، وتذكري بلي كاين واحد كيبغيك أو كايموت أيمكلك تخوي عليه قلبك ."],
+    ["كي تكوني فرحانة","فرحتك كتفرحني أنا كذلك. فرحي بزاف، وخليني نفرح معاك."],
+    ["كي تحتاجي ابتسامة","هادي ابتسامة مني 🙂 وتأكدي بلي كنفكر فيك بالخير."],
+    ["كي تشكي فراسك","راك أحسن من كل ما كتظني، وأنا كنبغيك بزاف."]]
+};
+
+/* ========== 5) أدوات مساعدة وتنقل ========== */
+const $=s=>document.querySelector(s), ids=['s0','s1','s2','s3','s4','s6','s7','s8'];
+const S=ids.map(i=>document.getElementById(i)); let cur=0,lock=false,still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const seen={}, timers=[]; const later=(f,t)=>timers.push(setTimeout(f,t));
+const dots=$('#dots'); ids.slice(1).forEach(()=>dots.appendChild(document.createElement('i')));
+
+// قلوب الخلفية (عدد محدود للأداء)
+for(let i=0;i<14;i++){const h=document.createElement('span');h.textContent='♥';h.style.cssText=`left:${Math.random()*100}%;font-size:${10+Math.random()*16}px;animation-duration:${9+Math.random()*9}s;animation-delay:${-Math.random()*14}s`;$('#bg').appendChild(h)}
+
+function burst(x,y,n=14){ if(still)return;
+  for(let i=0;i<n;i++){const p=document.createElement('span');p.className='p';p.textContent=Math.random()<.5?'♥':'✦';
+    const a=Math.random()*6.28,d=60+Math.random()*120;
+    p.style.cssText=`left:${x}px;top:${y}px;font-size:${12+Math.random()*14}px;--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d-40}px;--r:${Math.random()*80-40}deg`;
+    document.body.appendChild(p);setTimeout(()=>p.remove(),1600)}}
+const center=()=>burst(innerWidth/2,innerHeight/2,18);
+
+function go(n){
+  if(lock||n===cur||n<0||n>7)return; lock=true;
+  S[cur].classList.remove('on'); cur=n; S[n].classList.add('on'); S[n].scrollTop=0;
+  dots.style.display=n>0?'flex':'none'; $('#back').style.display=n>1?'block':'none';
+  [...dots.children].forEach((d,i)=>d.classList.toggle('a',i===n-1));
+  setTimeout(()=>lock=false,750);
+  if(!seen[n]){seen[n]=1; (enter[n]||(()=>{}))()}
+}
+document.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>go(cur+1)));
+$('#back').addEventListener('click',()=>go(cur-1));
+const reveal=(els,gap)=>els.forEach((e,i)=>still?e.classList.add('show'):later(()=>e.classList.add('show'),i*gap));
+const mk=(tag,txt,cls)=>{const e=document.createElement(tag);e.textContent=txt;if(cls)e.className=cls;return e};
+
+/* ========== 6) الظرف ========== */
+$('#s0t').textContent=C.envelopeCall;
+let opened=false;
+function openEnv(e){ if(opened)return; opened=true; $('#open').disabled=true;
+  $('#env').classList.add('open'); const r=$('#env').getBoundingClientRect();
+  later(()=>burst(r.left+r.width/2,r.top+r.height/3,20),900); later(()=>go(1),2600) }
+$('#seal').addEventListener('click',openEnv); $('#open').addEventListener('click',openEnv);
+
+/* ========== 7) ظهور النصوص لكل شاشة ========== */
+const enter={
+ 1(){ const hr=new Date().getHours();$('#s1h').textContent=(hr<5?'ليلة هنية':hr<12?'صباح الخير':hr<18?'نهارك زوين':'مساء الخير')+' يا منار 🌷'; const box=$('#s1l'); const els=[C.welcome].concat(C.welcomeLines).map(t=>{const p=mk('p',t,'hid');box.appendChild(p);return p});
+   reveal(els.concat($('#n1')),1600) },
+ 2(){ const L=$('#letter'); L.classList.add('show'); const ps=C.letter.map(t=>{const p=mk('p',t,'hid');L.appendChild(p);return p}); reveal(ps,1100) },
+ 3(){ $('#s3h').textContent=C.likeTitle; const g=$('#grid');
+   C.likes.forEach((l,i)=>{const c=document.createElement('button');c.className='card hid';c.innerHTML=`<span class="ic"></span><b></b><small></small>`;
+     c.children[0].textContent=l[0];c.children[1].textContent=l[1];c.children[2].textContent=l[2];
+     c.addEventListener('click',e=>{c.classList.add('pulse');setTimeout(()=>c.classList.remove('pulse'),500);burst(e.clientX,e.clientY,6)});
+     g.appendChild(c); still?c.classList.add('show'):later(()=>c.classList.add('show'),i*250)}) },
+ 4(){ $('#s4h').textContent=C.whyTitle; let i=0; const r=$('#reason');
+   $('#more').addEventListener('click',()=>{ r.classList.remove('show');
+     setTimeout(()=>{r.textContent=C.why[i];r.classList.add('show');i++;
+       if(i>=C.why.length){$('#more').style.display='none';$('#n4').style.display='inline-block'}else $('#more').textContent='كمل ورّيني'},still?0:350)});
+   r.textContent=''; },
+ 5(){ const box=$('#words'); const els=C.words.map((t,i)=>{const p=mk('p',t,'hid');p.style.fontSize=i===0?'2rem':'1.3rem';box.appendChild(p);return p});
+   box.appendChild(mk('p','لمسي الشاشة وازرعي ورد 🌹','dim')); reveal(els,2200) },
+ 6(){ $('#s7t').textContent=C.heartCall },
+ 7(){ const e=$('#end'),s=$('#sign'); e.textContent=C.ending; s.textContent=C.sign;
+   still?(e.classList.add('show'),s.classList.add('show')):(later(()=>e.classList.add('show'),600),later(()=>s.classList.add('show'),4200));
+   later(()=>center(),1500); later(()=>center(),5200); petals(); finale(); later(()=>$('#replay').classList.add('show'),6500) }
+};
+$('#still').addEventListener('click',function(){ still=!still; this.setAttribute('aria-pressed',still);
+  this.textContent=still?'رجّع الحركة':'وقّف الحركة';
+  if(still){timers.forEach(clearTimeout);document.querySelectorAll('.hid').forEach(e=>e.classList.add('show'))}});
+
+/* ========== 8) القلب السري ========== */
+let heartDone=false;
+$('#heart').addEventListener('click',function(e){ if(heartDone)return; heartDone=true; const h=this;
+  h.classList.add('pop'); const r=h.getBoundingClientRect();
+  setTimeout(()=>{h.classList.remove('pop');h.classList.add('open');burst(r.left+r.width/2,r.top+r.height/2,24);
+    const t=$('#secret'); typeIn(t,C.secret); /* الرسالة ما كتدخل للصفحة حتى كيتضغط القلب */
+    if(navigator.vibrate)navigator.vibrate([40,60,40]);
+    requestAnimationFrame(()=>t.classList.add('show')); const n=$('#n7'); n.style.display='inline-block'; setTimeout(()=>n.classList.add('show'),1500);
+    $('#s7t').style.display='none'; h.disabled=true},still?0:650) });
+
+/* ========== مزايا إضافية ========== */
+// كتابة النص حرفًا حرفًا (فورًا إذا الحركة موقوفة)
+function typeIn(el,txt){ if(still){el.textContent=txt;return} el.textContent=''; let i=0;
+  const iv=setInterval(()=>{el.textContent=txt.slice(0,++i);if(i>=txt.length)clearInterval(iv)},45) }
+// بتلات ورد تتساقط في الخاتمة
+function petals(){ if(still)return; for(let i=0;i<16;i++){const p=document.createElement('i');p.className='petal';
+  p.style.cssText=`left:${Math.random()*100}%;--dx:${Math.random()*120-60}px;animation-duration:${7+Math.random()*6}s;animation-delay:${Math.random()*6}s`;
+  document.body.appendChild(p);setTimeout(()=>p.remove(),14000)} }
+// نجوم متلألئة فالخلفية
+for(let i=0;i<28;i++){const s=document.createElement('b');s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s`;$('#bg').appendChild(s)}
+// أثر لامع تحت الإصبع/الفأرة + حركة عمق خفيفة للخلفية والظرف
+let lastT=0; addEventListener('pointermove',e=>{ if(still)return; const n=Date.now(); if(n-lastT<70)return; lastT=n;
+  const t=document.createElement('span');t.className='trail';t.style.left=e.clientX+'px';t.style.top=e.clientY+'px';document.body.appendChild(t);setTimeout(()=>t.remove(),800);
+  const dx=e.clientX/innerWidth-.5,dy=e.clientY/innerHeight-.5;
+  $('#bg').style.transform=`translate(${dx*-14}px,${dy*-14}px)`;
+  if(cur===0&&!opened)$('#env').style.transform=`rotateY(${dx*14}deg) rotateX(${dy*-10}deg)` });
+// حديقة ورد: لمسة فالشاشة السادسة كتزرع وردة
+S[5].addEventListener('pointerdown',e=>{ if(still||e.target.closest('button'))return;
+  const r=mk('span','🌹','rose');r.style.left=e.clientX+'px';r.style.top=e.clientY+'px';document.body.appendChild(r);setTimeout(()=>r.remove(),3000);burst(e.clientX,e.clientY,4)});
+// الخاتمة: رسائل "حلّيها كي..." + عدّاد الأيام + صورة اختيارية
+function finale(){ const w=$('#when'),note=$('#note');
+  C.notes.forEach(n=>{const b=mk('button','💌 '+n[0],'card');b.onclick=e=>{note.hidden=false;typeIn(note,n[1]);burst(e.clientX,e.clientY,8);note.scrollIntoView({block:'nearest',behavior:'smooth'})};w.appendChild(b)});
+  later(()=>w.classList.add('show'),still?0:7000);
+  if(C.since){const d=Math.floor((Date.now()-new Date(C.since))/864e5);if(d>0){const s=$('#since');s.textContent=d+' '+C.sinceText;later(()=>s.classList.add('show'),still?0:5500)}}
+  if(C.photo){const i=new Image();i.src=C.photo;i.alt='';$('#photo').appendChild(i);$('#photo').hidden=false;later(()=>$('#photo').classList.add('show'),still?0:2500)} }
+$('#replay').addEventListener('click',()=>location.reload());
+
+/* ========== 9) التهيئة ========== */
+document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'&&cur>0&&cur<7){const b=S[cur].querySelector('[data-next]');if(b&&b.offsetParent&&b.classList.contains('show')||(b&&!b.classList.contains('hid')))b.click()}});
+</script>
+</body>
+</html>
